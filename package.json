@@ -6,21 +6,50 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test": "jest"
   },
   "dependencies": {
+    "@radix-ui/react-progress": "^1.1.0",
+    "@radix-ui/react-slider": "^1.2.0",
+    "@radix-ui/react-slot": "^1.1.0",
+    "@radix-ui/react-toast": "^1.2.1",
+    "@radix-ui/react-tooltip": "^1.1.2",
+    "@types/formidable": "^3.4.5",
+    "archiver": "^7.0.1",
+    "axios": "^1.7.4",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.1",
+    "dotenv": "^16.4.5",
+    "formidable": "^3.5.1",
+    "lucide-react": "^0.428.0",
+    "multer": "^1.4.5-lts.1",
+    "next": "14.2.5",
+    "pg": "^8.12.0",
     "react": "^18",
     "react-dom": "^18",
-    "next": "14.2.5"
+    "react-dropzone": "^14.2.3",
+    "sharp": "^0.33.5",
+    "tailwind-merge": "^2.5.2",
+    "tailwindcss-animate": "^1.0.7",
+    "wretch": "^2.9.0"
   },
   "devDependencies": {
-    "typescript": "^5",
+    "@types/jest": "^29.5.12",
+    "@types/multer": "^1.4.11",
     "@types/node": "^20",
+    "@types/pg": "^8.11.6",
     "@types/react": "^18",
     "@types/react-dom": "^18",
-    "postcss": "^8",
-    "tailwindcss": "^3.4.1",
+    "@types/supertest": "^6.0.2",
+    "cypress": "^13.13.3",
     "eslint": "^8",
-    "eslint-config-next": "14.2.5"
+    "eslint-config-next": "14.2.5",
+    "jest": "^29.7.0",
+    "postcss": "^8",
+    "supertest": "^7.0.0",
+    "tailwindcss": "^3.4.1",
+    "ts-jest": "^29.2.4",
+    "typescript": "^5"
   }
 }

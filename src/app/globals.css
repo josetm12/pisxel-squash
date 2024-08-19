@@ -2,32 +2,108 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
+    --header-height: 5rem; /* Example height */
+    --footer-height: 2rem; /* Example height */
+    --main-body-height: calc(
+      100vh - var(--header-height) - var(--footer-height)
+    );
+
+    --color-1: 351 76% 58%; /* #E63946 */
+    --color-2: 97 56% 96%; /* #F1FAEE */
+    --color-3: 187 47% 76%; /* #A8DADC */
+    --color-4: 203 39% 44%; /* #457B9D */
+    --color-5: 215 50% 23%; /* #1D3557 */
+
+    --background: var(--color-2);
+    --foreground: var(--color-5);
+    --card: var(--color-2);
+    --card-foreground: var(--color-5);
+    --popover: var(--color-2);
+    --popover-foreground: var(--color-5);
+    --primary: var(--color-1);
+    --primary-foreground: var(--color-2);
+    --secondary: var(--color-3);
+    --secondary-foreground: var(--color-5);
+    --muted: var(--color-3);
+    --muted-foreground: var(--color-4);
+    --accent: var(--color-4);
+    --accent-foreground: var(--color-2);
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: var(--color-2);
+    --border: var(--color-4);
+    --input: var(--color-4);
+    --ring: var(--color-1);
+    --radius: 0.5rem;
+    --chart-1: var(--color-1);
+    --chart-2: var(--color-2);
+    --chart-3: var(--color-3);
+    --chart-4: var(--color-4);
+    --chart-5: var(--color-5);
+
+    --pattern-background: hsl(var(--background));
+    --pattern-foreground: hsl(var(--foreground) / 0.2);
+  }
+
+  .dark {
+    --background: var(--color-5);
+    --foreground: var(--color-2);
+    --card: var(--color-5);
+    --card-foreground: var(--color-2);
+    --popover: var(--color-5);
+    --popover-foreground: var(--color-2);
+    --primary: var(--color-1);
+    --primary-foreground: var(--color-2);
+    --secondary: var(--color-3);
+    --secondary-foreground: var(--color-5);
+    --muted: var(--color-4);
+    --muted-foreground: var(--color-2);
+    --accent: var(--color-3);
+    --accent-foreground: var(--color-5);
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: var(--color-2);
+    --border: var(--color-3);
+    --input: var(--color-3);
+    --ring: var(--color-1);
+
+    --pattern-background: hsl(var(--background));
+    --pattern-foreground: hsl(var(--foreground) / 0.2);
   }
 }
 
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
 }
 
 @layer utilities {
-  .text-balance {
-    text-wrap: balance;
+  .bg-pattern {
+    background-color: var(--pattern-background);
+    opacity: 0.8;
+    background-size: 11px 11px;
+    background-image: repeating-linear-gradient(
+      45deg,
+      var(--pattern-foreground) 0,
+      var(--pattern-foreground) 1.1px,
+      var(--pattern-background) 0,
+      var(--pattern-background) 50%
+    );
   }
+}
+
+header {
+  @apply h-[var(--header-height)];
+}
+
+main {
+  @apply h-[var(--main-body-height)];
+}
+
+footer {
+  @apply h-[var(--footer-height)];
 }
