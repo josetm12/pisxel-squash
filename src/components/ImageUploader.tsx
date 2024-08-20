@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import React, { useCallback, useState } from 'react';
-import { useDropzone } from 'react-dropzone';
+import { FileRejection, useDropzone } from 'react-dropzone';
 import styles from './ImageUploader.module.css';
 
 interface ImageUploadProps {
@@ -9,9 +9,21 @@ interface ImageUploadProps {
   maxSize?: number; // in bytes
 }
 
+const checkFileUploadError = (rejectedFiles: FileRejection[]) => {
+  console.log('Rejected files', rejectedFiles);
+  let errors: string[] = [];
+
+  rejectedFiles.forEach((rejectedFile) => {
+    const message = rejectedFile.errors[0].message;
+    if (errors.indexOf(message) === -1) errors.push(message);
+  });
+
+  console.log('unique errors', errors);
+};
+
 export const ImageUploader: React.FC<ImageUploadProps> = ({
   onFilesChange,
-  maxFiles = 5,
+  maxFiles = 1,
   maxSize = 5 * 1024 * 1024, // 5MB default
 }) => {
   const [files, setFiles] = useState<File[]>([]);
@@ -19,6 +31,12 @@ export const ImageUploader: React.FC<ImageUploadProps> = ({
 
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
+      console.log('inside callback ondrop files.', acceptedFiles);
+      if (acceptedFiles.length > maxFiles) {
+        console.log(`You can only upload up to ${maxFiles} files.`);
+        return;
+      }
+
       const newFiles = [...files, ...acceptedFiles].slice(0, maxFiles);
       setFiles(newFiles);
       onFilesChange(newFiles);
@@ -34,14 +52,19 @@ export const ImageUploader: React.FC<ImageUploadProps> = ({
     [files, maxFiles, onFilesChange]
   );
 
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    onDrop,
-    accept: {
-      'image/*': ['.jpeg', '.jpg', '.png', '.gif'],
-    },
-    maxSize: maxSize,
-    maxFiles: maxFiles,
-  });
+  const { getRootProps, getInputProps, fileRejections, isDragActive } =
+    useDropzone({
+      onDrop,
+      accept: {
+        'image/jpeg': [],
+        'image/png': [],
+        'image/jpg': [],
+      },
+      maxSize: maxSize,
+      maxFiles: maxFiles,
+    });
+
+  checkFileUploadError(fileRejections);
 
   const removeFile = (index: number) => {
     const newFiles = files.filter((_, i) => i !== index);
@@ -55,7 +78,6 @@ export const ImageUploader: React.FC<ImageUploadProps> = ({
   return (
     <div className="w-full h-full flex flex-col">
       <div className="flex-1 flex flex-row flex-wrap gap-10">
-        {previews.length > 0 && <div className="lg:w-1/2">Test</div>}
         <div
           {...getRootProps()}
           className={`bg-background flex-1 flex flex-col items-center justify-center p-6 border-2 border-dashed rounded-lg text-center cursor-pointer hover:shadow-md transition transform motion-reduce:transition-none motion-reduce:hover:transform-none ${
@@ -74,6 +96,7 @@ export const ImageUploader: React.FC<ImageUploadProps> = ({
             (Max {maxFiles} files, up to {maxSize / 1024 / 1024}MB each)
           </p>
         </div>
+        {<div className="w-full md:w-1/2 border-2">Filter options go here</div>}
       </div>
       {previews.length > 0 && (
         <div className="mt-6 flex flex-row items-center justify-between gap-2">

@@ -1,43 +1,88 @@
+import { NextResponse } from 'next/server';
+import path from 'path';
 import { writeFile } from 'fs/promises';
-import { NextRequest, NextResponse } from 'next/server';
+import sharp from 'sharp';
 
-export async function POST(request: NextRequest) {
-  const data = await request.formData();
-  const files: File[] | null = data.getAll('images') as unknown as File[];
+export const POST = async (req: any, res: any) => {
+  const formData = await req.formData();
 
-  console.log(data);
-  console.log('file', files);
+  const files = formData.getAll('file');
   if (!files) {
-    return NextResponse.json({ success: false });
+    return NextResponse.json({ error: 'No files received.' }, { status: 400 });
   }
 
-  const bytes = await files[0].arrayBuffer();
-  const buffer = Buffer.from(bytes);
+  if (files.length > 1) {
+    return NextResponse.json(
+      { error: 'Only 1 image upload supported.' },
+      { status: 400 }
+    );
+  }
+  console.log('files', files.length);
 
-  // With the file data in the buffer, you can do whatever you want with it.
-  // For this, we'll just write it to the filesystem in a new location
-  const path = `/tmp/${files[0].name}`;
-  //await writeFile(path, buffer);
-  console.log(`open ${path} to see the uploaded file`);
+  for (let i = 0; i < files.length; i++) {
+    const buffer = Buffer.from(await files[i].arrayBuffer());
+    const filename = Date.now() + files[i].name.replaceAll(' ', '_');
+    console.log(filename);
+    try {
+      await compressImage(buffer, { quality: 80, width: 1920 }, filename);
+      console.log(buffer);
+      // await writeFile(
+      //   path.join(process.cwd(), 'public/uploads/' + filename),
+      //   buffer
+      // );
+    } catch (error) {
+      console.log('Error occured ', error);
+      return NextResponse.json({ Message: 'Failed', status: 500 });
+    }
+  }
+  return NextResponse.json({ Message: 'Success', status: 201 });
+};
 
-  return NextResponse.json({ success: true });
+interface CompressionOptions {
+  quality?: number;
+  format?: keyof sharp.FormatEnum;
+  width?: number;
+  height?: number;
 }
 
-export async function GET(request: NextRequest) {
-  // Handle GET requests if needed
-  return NextResponse.json({ message: 'Upload endpoint is working' });
+async function compressImage(
+  inputBuffer: Buffer,
+  options: CompressionOptions = {},
+  filename: string
+): Promise<void> {
+  const { quality = 50, format = 'jpeg', width, height } = options;
 
-  // try {
-  //   // Return the paths of the processed files
-  //   return NextResponse.json({
-  //     message: 'Files uploaded successfully',
-  //     files: [],
-  //   });
-  // } catch (error: any) {
-  //   console.error('Upload error:', error);
-  //   return NextResponse.json(
-  //     { error: error.message || 'Error uploading files' },
-  //     { status: 500 }
-  //   );
-  // }
+  try {
+    let sharpImage = await sharp(inputBuffer);
+    const metaData = await sharpImage.metadata();
+    console.log('metadata', metaData);
+
+    // Resize if width or height is specified and the dimensions of the image are more than what is configured here
+    if (
+      (width && metaData.width && metaData.width > width) ||
+      (height && metaData.height && metaData.height > height)
+    ) {
+      sharpImage = sharpImage.resize(width, height);
+    }
+
+    // Compress and save the image
+    await sharpImage
+      .toFormat(format, { quality })
+      .toBuffer({ resolveWithObject: false })
+      .then(async (data) => {
+        console.log('After compress', data);
+        await writeFile(
+          path.join(process.cwd(), 'public/uploads/' + filename),
+          data
+        );
+        return data;
+      })
+      .catch((err) => {
+        throw new Error(err);
+      });
+
+    console.log(`Image compressed successfully`);
+  } catch (error) {
+    throw new Error('Compression error: ' + error);
+  }
 }
