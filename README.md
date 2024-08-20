@@ -37,4 +37,5 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/deploym
 
 Screenshots
 
-![alt text](image.png)
+![image](https://github.com/user-attachments/assets/ebe3a38d-1ae4-47fc-b3b9-8b65a9f5a6c0)
+
