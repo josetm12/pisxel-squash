@@ -32,11 +32,8 @@ const MainForm: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Here you would typically upload the files to your server
-    console.log('Files to upload:', files);
-    debugger;
-    // Implement your upload logic here
 
+    // Upload logic
     setIsUploading(true);
 
     try {
@@ -63,7 +60,7 @@ const MainForm: React.FC = () => {
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-4 flex flex-col gap-10 items-center justify-center h-full"
+      className="space-y-4 px-2 md:px-32 flex flex-col gap-10 items-center justify-center h-full"
     >
       <ImageUploader
         onFilesChange={handleFilesChange}

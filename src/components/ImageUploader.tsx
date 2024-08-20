@@ -74,10 +74,10 @@ const FilterOptions: React.FC<FilterOptionsProps> = ({ imageFile }) => {
       <Collapsible
         open={windowWidth > 767 || isOpen}
         onOpenChange={setIsOpen}
-        className="w-full md:w-1/2 flex flex-col gap-2 "
+        className="w-full flex flex-col gap-1 "
         disabled={windowWidth > 767}
       >
-        <div className="flex items-center justify-between space-x-4 px-4 bg-background">
+        <div className="flex items-center justify-center space-x-4 px-4 bg-background">
           <h4 className="text-md font-semibold">Image Compression Options</h4>
           <CollapsibleTrigger asChild>
             <Button variant="ghost" size="sm" className="w-9 p-0">
@@ -86,7 +86,7 @@ const FilterOptions: React.FC<FilterOptionsProps> = ({ imageFile }) => {
             </Button>
           </CollapsibleTrigger>
         </div>
-        <CollapsibleContent className="bg-background p-16 flex-1 flex flex-col gap-10 items-center justify-start">
+        <CollapsibleContent className="px-2 bg-background p-4 flex-1 flex flex-col gap-10 items-center justify-start">
           <div className="slider w-full">
             <div className="text-md font-semibold text-center mb-2">
               Quality: {quality}%
@@ -178,7 +178,7 @@ export const ImageUploader: React.FC<ImageUploadProps> = ({
 
   return (
     <div className="w-full h-full flex flex-col">
-      <div className="flex-1 flex flex-row flex-wrap gap-10">
+      <div className="flex-1 flex flex-col flex-wrap gap-10">
         {previews.length > 0 ? (
           <div
             key={previews[0]}
