@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import wretch from 'wretch';
 
 import { ImageUploader } from '@/components/ImageUploader';
@@ -34,6 +34,7 @@ const MainForm: React.FC = () => {
     e.preventDefault();
     // Here you would typically upload the files to your server
     console.log('Files to upload:', files);
+    debugger;
     // Implement your upload logic here
 
     setIsUploading(true);
@@ -43,6 +44,10 @@ const MainForm: React.FC = () => {
       files.forEach((file) => {
         formData.append('file', file);
       });
+      const quality = e.target?.elements?.quality?.value || '100';
+      const resizeBy = e.target?.elements?.imagesize?.value || '100';
+      formData.append('quality', quality);
+      formData.append('resizeBy', resizeBy);
 
       const result: FileUploadResponse = await api.post(formData).json();
 

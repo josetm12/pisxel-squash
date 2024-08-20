@@ -5,8 +5,10 @@ import sharp from 'sharp';
 
 export const POST = async (req: any, res: any) => {
   const formData = await req.formData();
-
   const files = formData.getAll('file');
+  let quality = parseInt(formData.get('quality') || 80, 10);
+  let resizeBy = parseInt(formData.get('resizeBy') || 100) / 100;
+
   if (!files) {
     return NextResponse.json({ error: 'No files received.' }, { status: 400 });
   }
@@ -17,19 +19,16 @@ export const POST = async (req: any, res: any) => {
       { status: 400 }
     );
   }
-  console.log('files', files.length);
 
   for (let i = 0; i < files.length; i++) {
     const buffer = Buffer.from(await files[i].arrayBuffer());
     const filename = Date.now() + files[i].name.replaceAll(' ', '_');
-    console.log(filename);
     try {
-      await compressImage(buffer, { quality: 80, width: 1920 }, filename);
-      console.log(buffer);
-      // await writeFile(
-      //   path.join(process.cwd(), 'public/uploads/' + filename),
-      //   buffer
-      // );
+      await compressImage(
+        buffer,
+        { quality: quality, scale: resizeBy },
+        filename
+      );
     } catch (error) {
       console.log('Error occured ', error);
       return NextResponse.json({ Message: 'Failed', status: 500 });
@@ -41,6 +40,7 @@ export const POST = async (req: any, res: any) => {
 interface CompressionOptions {
   quality?: number;
   format?: keyof sharp.FormatEnum;
+  scale?: number;
   width?: number;
   height?: number;
 }
@@ -50,15 +50,23 @@ async function compressImage(
   options: CompressionOptions = {},
   filename: string
 ): Promise<void> {
-  const { quality = 50, format = 'jpeg', width, height } = options;
+  const { quality = 50, format = 'jpeg', width, height, scale } = options;
+  let scaledWidth;
 
   try {
     let sharpImage = await sharp(inputBuffer);
     const metaData = await sharpImage.metadata();
-    console.log('metadata', metaData);
+
+    if (scale && metaData.width) {
+      scaledWidth = metaData.width * scale;
+    }
+
+    console.log(scaledWidth, scale, 'scaled width');
 
     // Resize if width or height is specified and the dimensions of the image are more than what is configured here
-    if (
+    if (scaledWidth) {
+      sharpImage = sharpImage.resize(scaledWidth);
+    } else if (
       (width && metaData.width && metaData.width > width) ||
       (height && metaData.height && metaData.height > height)
     ) {
@@ -70,7 +78,6 @@ async function compressImage(
       .toFormat(format, { quality })
       .toBuffer({ resolveWithObject: false })
       .then(async (data) => {
-        console.log('After compress', data);
         await writeFile(
           path.join(process.cwd(), 'public/uploads/' + filename),
           data
@@ -80,8 +87,6 @@ async function compressImage(
       .catch((err) => {
         throw new Error(err);
       });
-
-    console.log(`Image compressed successfully`);
   } catch (error) {
     throw new Error('Compression error: ' + error);
   }
